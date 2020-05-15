@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Appenders>
+
+		<RollingFile name="rollingFile"
+			fileName="/var/log/asterisk/stock_order_ivr.log"
+			filePattern="/var/log/asterisk/stock_order_ivr.%d{dd-MMM}.log.gz"
+			ignoreExceptions="false">
+			<PatternLayout>
+				<Pattern>%d [%t] %-5p (%F: %L) %m%n</Pattern>
+			</PatternLayout>
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="10 MB" />
+				<TimeBasedTriggeringPolicy interval="1" />
+			</Policies>
+			<DefaultRolloverStrategy max="5" />
+		</RollingFile>
+
+	</Appenders>
+
+	<Loggers>
+		<Root level="ALL">
+			<AppenderRef ref="rollingFile" />
+		</Root>
+		
+	</Loggers>
+</Configuration>
