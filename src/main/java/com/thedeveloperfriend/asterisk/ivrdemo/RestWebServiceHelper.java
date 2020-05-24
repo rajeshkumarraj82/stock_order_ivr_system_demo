@@ -15,7 +15,7 @@ public class RestWebServiceHelper {
 
 		Client client = Client.create();
 		WebResource webResource = client
-				.resource("http://localhost/stock_price_rest_ws/GetStockPrice.php?StockSymbol=" + stockSymbol);
+				.resource("https://thedeveloperfriend.com/stock_price_rest_ws/GetStockPrice.php?StockSymbol=" + stockSymbol);
 		ClientResponse response = webResource.accept("application/json").get(ClientResponse.class);
 
 		String output = response.getEntity(String.class);
