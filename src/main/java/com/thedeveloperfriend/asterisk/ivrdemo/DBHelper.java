@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 public class DBHelper {
 
 	Logger logger = LogManager.getRootLogger();
-	
+
 	private static String HOST_NAME = "localhost";
 	private static String PORT = "3306";
 	private static String DATABASENAME = "stock_db";
@@ -34,7 +34,7 @@ public class DBHelper {
 		preparedStatement.close();
 		connection.close();
 	}
-	
+
 	public boolean validateUsernamePassword(String user_id, String password)
 			throws ClassNotFoundException, SQLException {
 		boolean isValidCredentials = false;
@@ -47,10 +47,32 @@ public class DBHelper {
 		if (resultSet.next()) {
 			isValidCredentials = true;
 		}
-		
+
 		closeDBObjects(resultSet, preparedStatement, connection);
-		this.logger.debug("DBHelper:validateUsernamePassword:user_id=" + user_id + ":isValidCredentials="+isValidCredentials);
+		this.logger.debug(
+				"DBHelper:validateUsernamePassword:user_id=" + user_id + ":isValidCredentials=" + isValidCredentials);
 		return isValidCredentials;
+	}
+
+	public long insertOrderDetails(int user_id, String stock_symbol, int qty, double price)
+			throws SQLException, ClassNotFoundException {
+		long generatedOrderId = 0;
+		Connection connection = getConnection();
+		String sqlQuery = "insert into stock_order (user_id, stock_symbol, qty, price) values(?,?,?,?)";
+		PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery,
+				PreparedStatement.RETURN_GENERATED_KEYS);
+		preparedStatement.setInt(1, user_id);
+		preparedStatement.setString(2, stock_symbol);
+		preparedStatement.setInt(3, qty);
+		preparedStatement.setDouble(4, price);
+		preparedStatement.executeUpdate();
+
+		ResultSet resultSet = preparedStatement.getGeneratedKeys();
+		if (resultSet.next()) {
+			generatedOrderId = resultSet.getLong(1);
+		}
+
+		return generatedOrderId;
 	}
 
 }

@@ -37,11 +37,26 @@ public class StockOrderIVR extends BaseAgiScript {
 			this.logger.debug("userId = " + userId + " : stockPrice = " + stockPrice);
 
 			// get the quantity from user
-			int quantity = getQuantity();
+			String quantity = getQuantity();
 			this.logger.debug("userId = " + userId + " : quantity = " + quantity);
 
-			// Play the audio "You have successfully placed the order. Thank You"
-			streamFile("success_msg");
+			// confirm the quantity with user
+			if (confirmQuantity(quantity)) {
+				this.logger.debug("userId = " + userId + " : User confirmed the quantity");
+				// user confirmed the quantity so go ahead and place the order
+				long orderId = dbHelper.insertOrderDetails(Integer.parseInt(userId), selectedStockSymbol,
+						Integer.parseInt(quantity), stockPrice);
+				// Play the audio "You have successfully placed the order. Your Order Id is"
+				streamFile("success_msg");
+				// Play the Order Id generated
+				sayDigits(String.valueOf(orderId));
+
+			} else {
+				// user did't confirm the quantity
+				streamFile("invalid_entry");
+				hangup();
+			}
+
 			// Terminate the call
 			hangup();
 			this.logger.debug("CALL HANGUP ......");
@@ -138,7 +153,7 @@ public class StockOrderIVR extends BaseAgiScript {
 
 	// Method to ask the user to enter the quantity followed by hash symbol
 	// The maximum digits allowed is 4
-	public int getQuantity() throws AgiException, UserReTryCountExceededException {
+	public String getQuantity() throws AgiException, UserReTryCountExceededException {
 
 		try {
 			int retry_counter = 0;
@@ -148,7 +163,7 @@ public class StockOrderIVR extends BaseAgiScript {
 				this.logger.debug("quantity typed by user = " + qty);
 
 				if (qty != null && StringUtils.isNumeric(qty)) {
-					return Integer.parseInt(qty);
+					return qty;
 				} else if ((retry_counter < 2)) {
 					// Play the audio "You have entered an invalid option"
 					streamFile("invalid_entry");
@@ -164,6 +179,23 @@ public class StockOrderIVR extends BaseAgiScript {
 			throw e;
 		}
 
+	}
+
+	// Method to confirm the quantity number entered
+	public boolean confirmQuantity(String quantity) throws AgiException {
+		boolean isCorrectQuantity = false;
+		// Play the quantity to user
+		streamFile("qty_repeat_msg");
+		sayNumber(quantity);
+
+		// Press 1 to confirm. Press 2 for cancel
+		String confirmationCode = getData("ask_confirmation", 15000, 1);
+
+		if (confirmationCode != null && confirmationCode.equals("1")) {
+			isCorrectQuantity = true;
+		}
+
+		return isCorrectQuantity;
 	}
 
 }
