@@ -6,9 +6,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 //Database helper class for IVR program
 public class DBHelper {
 
+	Logger logger = LogManager.getRootLogger();
+	
 	private static String HOST_NAME = "localhost";
 	private static String PORT = "3306";
 	private static String DATABASENAME = "stock_db";
@@ -44,7 +49,7 @@ public class DBHelper {
 		}
 		
 		closeDBObjects(resultSet, preparedStatement, connection);
-
+		this.logger.debug("DBHelper:validateUsernamePassword:user_id=" + user_id + ":isValidCredentials="+isValidCredentials);
 		return isValidCredentials;
 	}
 
