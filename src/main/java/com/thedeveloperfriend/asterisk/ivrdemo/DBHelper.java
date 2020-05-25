@@ -18,7 +18,7 @@ public class DBHelper {
 	private static String PORT = "3306";
 	private static String DATABASENAME = "stock_db";
 	private static String USERNAME = "stock_db_user";
-	private static String PASSWORD = "weblogic";
+	private static String PASSWORD = "Password@123";
 
 	private Connection getConnection() throws ClassNotFoundException, SQLException {
 		Connection connection = null;
